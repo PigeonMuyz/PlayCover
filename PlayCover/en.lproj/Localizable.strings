@@ -335,3 +335,4 @@
 "alert.version.title" = "New Version Available";
 "alert.version.text" = "A new version for %@ is available. Do you want to download it?";
 
+"preferences.toggle.removeSandboxData" = "Remove sandbox data";
