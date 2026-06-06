@@ -11,6 +11,7 @@ class UninstallPreferences: NSObject, ObservableObject {
     static var shared = UninstallPreferences()
 
     @objc @AppStorage("ClearAppDataUninstall") var clearAppData = false
+    @objc @AppStorage("RemoveSandboxDataUninstall") var removeSandboxData = false
     @objc @AppStorage("RemoveAppKeymapUninstall") var removeAppKeymap = false
     @objc @AppStorage("RemoveAppSettingUninstall") var removeAppSettings = false
     @objc @AppStorage("RemoveAppEntitlementsUninstall") var removeAppEntitlements = false
@@ -36,6 +37,8 @@ struct UninstallSettings: View {
                                isOn: $uninstallPreferences.showUninstallPopup)
                         Toggle("preferences.toggle.clearAppData",
                                isOn: $uninstallPreferences.clearAppData)
+                        Toggle("preferences.toggle.removeSandboxData",
+                               isOn: $uninstallPreferences.removeSandboxData)
                         Toggle("preferences.toggle.removeKeymap",
                                isOn: $uninstallPreferences.removeAppKeymap)
                         Toggle("preferences.toggle.removeSetting",
@@ -66,6 +69,6 @@ struct UninstallSettings: View {
             })
         }
         .padding(30)
-        .frame(width: 600, height: 240, alignment: .center)
+        .frame(width: 600, height: 260, alignment: .center)
     }
 }

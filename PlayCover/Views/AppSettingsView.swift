@@ -204,7 +204,7 @@ struct GraphicsView: View {
         return formatter
     }
 
-    @State var customScaler = 2.0
+    @State var customScaler = 1.0
     static var fractionFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -332,11 +332,10 @@ struct GraphicsView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .trailing)
                     } else if settings.settings.resolution == 1 {
-                        let width = Int(NSScreen.main?.frame.width ?? 1920)
-                        let height = getHeightForNotch(width, Int(NSScreen.main?.frame.height ?? 1080))
+                        let resolution = detectedResolution
                         Text("settings.text.detectedResolution")
                         Spacer()
-                        Text("\(width) x \(height)")
+                        Text("\(resolution.width) x \(resolution.height)")
                     } else {
                         Spacer()
                     }
@@ -437,8 +436,9 @@ struct GraphicsView: View {
         switch settings.settings.resolution {
         // Adaptive resolution = Auto
         case 1:
-            width = Int(NSScreen.main?.frame.width ?? 1920)
-            height = getHeightForNotch(width, Int(NSScreen.main?.frame.height ?? 1080))
+            let resolution = detectedResolution
+            width = resolution.width
+            height = resolution.height
         // Adaptive resolution = 1080p
         case 2:
             height = 1080
@@ -467,6 +467,17 @@ struct GraphicsView: View {
 
         showResolutionWarning = Double(width * height) * customScaler >= 2621440 * 2.0
         // Tends to crash when the number of pixels exceeds that
+    }
+
+    var detectedResolution: (width: Int, height: Int) {
+        let screen = NSScreen.main
+        let displayID = (screen?.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value
+        let width = displayID.map { Int(CGDisplayPixelsWide($0)) }
+            ?? Int((screen?.frame.width ?? 1920) * (screen?.backingScaleFactor ?? 1.0))
+        let height = displayID.map { Int(CGDisplayPixelsHigh($0)) }
+            ?? Int((screen?.frame.height ?? 1080) * (screen?.backingScaleFactor ?? 1.0))
+
+        return (width, getHeightForNotch(width, height))
     }
 
     func getWidthFromAspectRatio(_ height: Int) -> Int {

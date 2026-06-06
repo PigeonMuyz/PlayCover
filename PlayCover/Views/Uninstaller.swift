@@ -21,8 +21,10 @@ class Uninstaller {
         PlayTools.playCoverContainer.appendingPathComponent("Keymapping"),
         PlayTools.playCoverContainer.appendingPathComponent("PlayChain")
     ]
+    private static let sandboxURLs: [URL] = [
+        Uninstaller.libraryUrl.appendingPathComponent("Containers")
+    ]
     private static let cacheURLs: [URL] = [
-        Uninstaller.libraryUrl.appendingPathComponent("Containers"),
         Uninstaller.libraryUrl.appendingPathComponent("Application Scripts"),
         Uninstaller.libraryUrl.appendingPathComponent("Caches"),
         Uninstaller.libraryUrl.appendingPathComponent("HTTPStorages"),
@@ -53,6 +55,7 @@ class Uninstaller {
                 ("removeAppEntitlements", NSLocalizedString("preferences.toggle.removeEntitlements", comment: "")),
                 ("removeAppSettings", NSLocalizedString("preferences.toggle.removeSetting", comment: "")),
                 ("removeAppKeymap", NSLocalizedString("preferences.toggle.removeKeymap", comment: "")),
+                ("removeSandboxData", NSLocalizedString("preferences.toggle.removeSandboxData", comment: "")),
                 ("clearAppData", NSLocalizedString("preferences.toggle.clearAppData", comment: ""))
             ]
 
@@ -113,6 +116,11 @@ class Uninstaller {
 
         if UninstallPreferences.shared.clearAppData {
             await app.clearAllCache()
+            uninstallNum += 1
+        }
+
+        if UninstallPreferences.shared.removeSandboxData {
+            app.container.clear()
             uninstallNum += 1
         }
 
@@ -194,6 +202,7 @@ class Uninstaller {
             let danglingItems = try PlayApp.bundleIDCache.filter { !bundleIds.contains($0) }
 
             var fullPruneURLs = pruneURLs
+            fullPruneURLs.append(contentsOf: sandboxURLs)
             fullPruneURLs.append(contentsOf: cacheURLs)
 
             var prunedIds: [String] = []
